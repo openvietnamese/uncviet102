@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIET 102 – Marathon Đọc v2 </title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#C0392B; --red-light:#E8534A; --red-pale:#FDEDEC;
+  --gold:#D4A017; --gold-pale:#FEF9E7;
+  --navy:#2C3E50; --navy-light:#34495E;
+  --w1:#C0392B; --w1-bg:#FDEDEC; --w1-mid:#E8534A;
+  --w2:#1A5276; --w2-bg:#EBF5FB; --w2-mid:#2E86C1;
+  --w3:#1E8449; --w3-bg:#EAFAF1; --w3-mid:#27AE60;
+  --bg:#FFF8F4; --card:#fff; --border:#E8E0D8;
+  --shadow:0 2px 12px rgba(0,0,0,.08);
+  --radius:14px;
+  --tts-btn:#7B2FBE;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--navy);min-height:100vh}
+
+/* ── LAYOUT ── */
+#app{display:flex;min-height:100vh}
+#sidebar{width:280px;background:var(--navy);color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:100;transition:transform .3s}
+#main{margin-left:280px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+
+/* ── SIDEBAR ── */
+.sidebar-header{padding:20px 16px 12px;border-bottom:1px solid rgba(255,255,255,.12)}
+.sidebar-logo{font-size:22px;font-weight:900;color:#fff;line-height:1.2}
+.sidebar-logo span{color:var(--gold)}
+.sidebar-sub{font-size:11px;opacity:.6;margin-top:3px}
+.sidebar-progress{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.12)}
+.sp-label{font-size:11px;opacity:.6;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.sp-bar{height:8px;background:rgba(255,255,255,.15);border-radius:4px;overflow:hidden}
+.sp-fill{height:100%;background:linear-gradient(90deg,var(--gold),#F0C040);border-radius:4px;transition:width .5s ease}
+.sp-text{font-size:12px;margin-top:5px;opacity:.75}
+.sidebar-nav{flex:1;padding:10px 0}
+.week-group{margin-bottom:4px}
+.week-label{padding:8px 16px 4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;opacity:.45}
+.nav-item{display:flex;align-items:center;padding:9px 16px;cursor:pointer;transition:background .15s;gap:10px;font-size:13px}
+.nav-item:hover{background:rgba(255,255,255,.08)}
+.nav-item.active{background:rgba(255,255,255,.15)}
+.nav-item.done .ni-icon{color:#2ECC71}
+.ni-icon{font-size:14px;width:20px;text-align:center;flex-shrink:0}
+.ni-title{flex:1;line-height:1.3}
+.ni-day{font-size:10px;opacity:.45}
+.ni-score{font-size:11px;font-weight:700;padding:2px 6px;background:rgba(255,255,255,.12);border-radius:8px;flex-shrink:0}
+.sidebar-footer{padding:12px 16px;border-top:1px solid rgba(255,255,255,.12)}
+.btn-report{width:100%;padding:10px;background:var(--gold);color:var(--navy);border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;transition:opacity .2s}
+.btn-report:hover{opacity:.85}
+
+/* ── TOP BAR ── */
+#topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.tb-title{font-size:16px;font-weight:800}
+.tb-right{display:flex;align-items:center;gap:12px}
+.tb-stars{font-size:18px}
+.tb-points{font-weight:800;font-size:14px;color:var(--gold)}
+#menu-toggle{display:none;background:none;border:none;font-size:22px;cursor:pointer;color:var(--navy)}
+
+/* ── VIEWS ── */
+.view{display:none;flex:1}
+.view.active{display:flex;flex-direction:column}
+
+/* ── DASHBOARD ── */
+#dashboard{padding:28px;max-width:860px;width:100%}
+.dash-hero{background:linear-gradient(135deg,#7B2FBE 0%,var(--red) 60%,#922B21 100%);color:#fff;border-radius:20px;padding:28px 32px;margin-bottom:24px;position:relative;overflow:hidden}
+.dash-hero::before{content:'vi';position:absolute;right:24px;top:50%;transform:translateY(-50%);font-size:80px;opacity:.15}
+.hero-label{font-size:12px;text-transform:uppercase;letter-spacing:1px;opacity:.7;margin-bottom:6px}
+.hero-title{font-size:28px;font-weight:900;line-height:1.2;margin-bottom:8px}
+.hero-sub{font-size:14px;opacity:.8}
+.v2-badge{display:inline-block;background:rgba(255,255,255,.25);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800;margin-left:8px;letter-spacing:.5px}
+.dash-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{background:#fff;border-radius:14px;padding:18px 16px;text-align:center;box-shadow:var(--shadow);border:1px solid var(--border)}
+.stat-num{font-size:28px;font-weight:900;line-height:1}
+.stat-lbl{font-size:11px;opacity:.55;margin-top:4px;text-transform:uppercase;letter-spacing:.4px}
+.dash-weeks{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
+.week-card{background:#fff;border-radius:14px;padding:18px;box-shadow:var(--shadow);border-top:4px solid var(--wc)}
+.wc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.wc-title{font-size:14px;font-weight:800}
+.wc-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;background:var(--wc-bg);color:var(--wc)}
+.wc-lessons{font-size:11px;opacity:.55;margin-bottom:14px}
+.story-mini{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f0ece8;cursor:pointer}
+.story-mini:last-child{border-bottom:none}
+.story-mini:hover .sm-title{color:var(--red)}
+.sm-icon{font-size:14px;width:20px;text-align:center}
+.sm-title{font-size:12px;font-weight:600;flex:1;transition:color .15s}
+.sm-score{font-size:11px;font-weight:700;color:var(--gold)}
+.prize-banner{background:var(--gold-pale);border:2px solid var(--gold);border-radius:14px;padding:18px 22px;display:flex;align-items:center;gap:16px}
+.pb-icon{font-size:36px}
+.pb-text strong{font-size:14px;font-weight:800;color:var(--navy)}
+.pb-text p{font-size:12px;color:#666;margin-top:3px}
+
+/* ── STORY VIEW ── */
+#story-view{padding:28px;max-width:780px;width:100%}
+.story-nav{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.btn-back{background:none;border:1px solid var(--border);padding:7px 14px;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;cursor:pointer;color:var(--navy-light);transition:all .15s}
+.btn-back:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+.story-crumb{font-size:13px;color:#888}
+.story-crumb strong{color:var(--navy)}
+.story-header{border-radius:16px;padding:22px 24px;margin-bottom:20px;border-left:5px solid var(--wcolor)}
+.sh-meta{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;opacity:.6;margin-bottom:6px}
+.sh-title-vn{font-size:22px;font-weight:900;margin-bottom:4px}
+.sh-title-en{font-size:14px;opacity:.65;font-style:italic}
+
+/* ── TTS BUTTON ── */
+.tts-bar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.btn-tts{display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--tts-btn);color:#fff;border:none;border-radius:22px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(123,47,190,.3)}
+.btn-tts:hover{opacity:.9;transform:translateY(-1px)}
+.btn-tts.playing{background:#27AE60;box-shadow:0 2px 8px rgba(39,174,96,.3)}
+.btn-tts.playing::before{content:'';display:inline-block;width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.7);animation:pulse 1s infinite}
+.tts-speed{padding:6px 10px;border:1px solid var(--border);border-radius:20px;font-family:'Nunito',sans-serif;font-size:12px;background:#fff;cursor:pointer;color:var(--navy);font-weight:700}
+.tts-voice-note{font-size:11px;color:#999;font-style:italic}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.4);opacity:1}}
+
+/* ── STORY BODY ── */
+.story-body{background:#fff;border-radius:14px;padding:22px 24px;margin-bottom:16px;box-shadow:var(--shadow);line-height:1.9;font-size:15px}
+.narr{color:#555;font-style:italic;margin:8px 0}
+.dial{margin:8px 0;padding:8px 14px;border-radius:10px;background:#FAFAFA;display:flex;gap:6px;flex-wrap:wrap;align-items:baseline}
+.dial-sp{font-weight:800;font-size:13px;white-space:nowrap;flex-shrink:0}
+.dial-text{font-size:15px;color:var(--navy);flex:1}
+
+/* ── VOCAB TOOLTIP ── */
+.vt{
+  position:relative;
+  border-bottom:2px dotted;
+  cursor:help;
+  font-weight:700;
+  border-radius:2px;
+  padding:0 1px;
+  transition:background .15s;
+}
+.vt:hover{background:rgba(212,160,23,.18)}
+.vt-tip{
+  visibility:hidden;
+  opacity:0;
+  position:absolute;
+  bottom:calc(100% + 6px);
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--navy);
+  color:#fff;
+  padding:6px 10px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:600;
+  white-space:nowrap;
+  pointer-events:none;
+  z-index:200;
+  transition:opacity .18s, visibility .18s;
+  box-shadow:0 4px 12px rgba(0,0,0,.25);
+  line-height:1.4;
+}
+.vt-tip::after{
+  content:'';
+  position:absolute;
+  top:100%;
+  left:50%;
+  transform:translateX(-50%);
+  border:5px solid transparent;
+  border-top-color:var(--navy);
+}
+.vt:hover .vt-tip,
+.vt:focus .vt-tip{
+  visibility:visible;
+  opacity:1;
+}
+/* Touch support */
+.vt-tip.show{visibility:visible !important;opacity:1 !important}
+
+/* Week color for tooltip underline */
+.w1 .vt,.w1-tip{border-color:var(--w1-mid);color:var(--w1)}
+.w2 .vt,.w2-tip{border-color:var(--w2-mid);color:var(--w2)}
+.w3 .vt,.w3-tip{border-color:var(--w3-mid);color:var(--w3)}
+
+/* ── VOCAB SECTION ── */
+.section-card{background:#fff;border-radius:14px;padding:20px 22px;margin-bottom:16px;box-shadow:var(--shadow)}
+.section-title{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.vocab-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.vocab-item{display:flex;gap:8px;padding:7px 10px;border-radius:8px;background:#FAFAFA;font-size:13px}
+.vocab-vn{font-weight:700;min-width:130px}
+.vocab-en{color:#666}
+.grammar-box{background:var(--gold-pale);border-left:4px solid var(--gold);padding:12px 16px;border-radius:0 10px 10px 0;font-size:13px;color:var(--navy-light);line-height:1.6;margin-top:12px}
+
+/* ── QUIZ ── */
+.quiz-section{background:#fff;border-radius:14px;padding:22px;margin-bottom:16px;box-shadow:var(--shadow)}
+.quiz-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.quiz-score-display{font-size:13px;font-weight:700;padding:5px 12px;border-radius:20px;background:#f0ece8}
+.question-block{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #f0ece8}
+.question-block:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.q-number{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#999;margin-bottom:6px}
+.q-text{font-size:15px;font-weight:700;margin-bottom:12px;line-height:1.5}
+.options{display:grid;gap:8px}
+.opt-btn{width:100%;text-align:left;padding:12px 16px;border:2px solid var(--border);border-radius:11px;background:#fff;font-family:'Nunito',sans-serif;font-size:14px;cursor:pointer;transition:all .2s;position:relative;color:var(--navy);font-weight:600}
+.opt-btn:hover:not(:disabled){border-color:var(--wcolor);background:var(--wbg)}
+.opt-btn.correct{border-color:#27AE60;background:#EAFAF1;color:#1E8449}
+.opt-btn.wrong{border-color:#E74C3C;background:#FDEDEC;color:#C0392B}
+.opt-btn.reveal-correct{border-color:#27AE60;background:#EAFAF1;color:#1E8449}
+.opt-btn:disabled{cursor:default}
+.opt-btn .opt-badge{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:16px}
+.q-feedback{margin-top:8px;font-size:13px;font-weight:700;min-height:20px}
+.q-feedback.correct{color:#27AE60}
+.q-feedback.wrong{color:#E74C3C}
+
+/* ── QUIZ RESULT ── */
+.quiz-result{display:none;text-align:center;padding:24px 0 8px}
+.qr-circle{width:80px;height:80px;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900}
+.qr-score{font-size:15px;font-weight:700;margin-bottom:4px}
+.qr-msg{font-size:13px;color:#888}
+.btn-next-story{margin-top:16px;padding:12px 28px;background:var(--wcolor);color:#fff;border:none;border-radius:11px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;cursor:pointer;transition:opacity .2s}
+.btn-next-story:hover{opacity:.85}
+.btn-retry{margin-top:8px;padding:10px 20px;background:#f0ece8;color:var(--navy);border:none;border-radius:11px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:opacity .2s;margin-left:8px}
+
+/* ── REPORT MODAL ── */
+#report-modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.5);align-items:center;justify-content:center}
+#report-modal.open{display:flex}
+.modal-box{background:#fff;border-radius:20px;padding:28px;max-width:560px;width:90%;max-height:85vh;overflow-y:auto}
+.modal-title{font-size:18px;font-weight:900;margin-bottom:6px}
+.modal-sub{font-size:13px;color:#888;margin-bottom:18px}
+#report-text{width:100%;height:240px;border:1px solid var(--border);border-radius:10px;padding:12px;font-family:monospace;font-size:12px;resize:none;color:var(--navy)}
+.modal-actions{display:flex;gap:10px;margin-top:14px}
+.btn-copy{flex:1;padding:11px;background:var(--red);color:#fff;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;cursor:pointer}
+.btn-close-modal{padding:11px 20px;background:#f0ece8;color:var(--navy);border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;cursor:pointer}
+.canvas-tip{background:#EBF5FB;border-radius:10px;padding:12px 14px;font-size:12px;color:#1A5276;margin-bottom:14px;line-height:1.6}
+
+/* ── TTS NOT SUPPORTED ── */
+.tts-unsupported{background:#FFF3CD;border:1px solid #FFC107;border-radius:8px;padding:8px 14px;font-size:12px;color:#856404;margin-bottom:12px}
+
+/* ── CONFETTI ── */
+.confetti-piece{position:fixed;width:10px;height:10px;border-radius:2px;animation:fall 1.8s ease-in forwards;pointer-events:none;z-index:999}
+@keyframes fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  #sidebar{transform:translateX(-100%)}
+  #sidebar.open{transform:translateX(0)}
+  #main{margin-left:0}
+  #menu-toggle{display:block}
+  .dash-stats{grid-template-columns:repeat(2,1fr)}
+  .dash-weeks{grid-template-columns:1fr}
+  .vocab-grid{grid-template-columns:1fr}
+  #dashboard,#story-view{padding:16px}
+  .dash-hero{padding:20px}
+  .vt-tip{font-size:11px;max-width:180px;white-space:normal;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+<!-- ════ SIDEBAR ════ -->
+<nav id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">VIET 102 <span>🇻🇳</span></div>
+    <div class="sidebar-sub">Marathon Đọc v2 · Phiên bản mới!</div>
+  </div>
+  <div class="sidebar-progress">
+    <div class="sp-label">Tiến độ / Progress</div>
+    <div class="sp-bar"><div class="sp-fill" id="sb-fill" style="width:0%"></div></div>
+    <div class="sp-text" id="sb-text">0 / 15 câu chuyện</div>
+  </div>
+  <div class="sidebar-nav" id="sidebar-nav"></div>
+  <div class="sidebar-footer">
+    <button class="btn-report" onclick="openReport()">📋 Xuất Kết Quả → Canvas</button>
+  </div>
+</nav>
+
+<!-- ════ MAIN ════ -->
+<div id="main">
+  <div id="topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button id="menu-toggle" onclick="toggleSidebar()">☰</button>
+      <div class="tb-title" id="tb-title">Marathon Đọc v2</div>
+    </div>
+    <div class="tb-right">
+      <span class="tb-stars" id="tb-stars">⭐</span>
+      <span class="tb-points" id="tb-points">0 điểm</span>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="view-dashboard" class="view active" style="flex-direction:column;align-items:flex-start;overflow-y:auto">
+    <div id="dashboard">
+      <div class="dash-hero">
+        <div class="hero-label">VIET 102 · UNC Chapel Hill</div>
+        <div class="hero-title">Marathon Đọc 📖 <span class="v2-badge">V2 🔊 🗨️</span></div>
+        <div class="hero-sub">15 câu chuyện mới • Nghe TTS tiếng Việt • Từ vựng có chú thích</div>
+      </div>
+      <div class="dash-stats">
+        <div class="stat-card"><div class="stat-num" id="stat-done" style="color:var(--red)">0</div><div class="stat-lbl">Đã đọc</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-score" style="color:var(--gold)">0</div><div class="stat-lbl">Tổng điểm</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-pct" style="color:var(--w3)">0%</div><div class="stat-lbl">Chính xác</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-streak" style="color:#E67E22">🔥0</div><div class="stat-lbl">Streak</div></div>
+      </div>
+      <div class="dash-weeks" id="dash-weeks"></div>
+      <div class="prize-banner">
+        <div class="pb-icon">🏆</div>
+        <div class="pb-text">
+          <strong>Giải Thưởng · Prize</strong>
+          <p>2 người đạt điểm cao nhất sẽ nhận <strong> Phần thưởng từ Thầy Huy </strong> – Chapel Hill, NC </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STORY VIEW -->
+  <div id="view-story" class="view" style="overflow-y:auto;align-items:flex-start">
+    <div id="story-view"></div>
+  </div>
+</div>
+</div>
+
+<!-- ════ REPORT MODAL ════ -->
+<div id="report-modal">
+  <div class="modal-box">
+    <div class="modal-title">📋 Xuất Kết Quả</div>
+    <div class="modal-sub">Sao chép và dán vào Canvas để nộp điểm.</div>
+    <div class="canvas-tip">💡 <strong>Hướng dẫn nộp Canvas:</strong> Sao chép bảng điểm bên dưới → vào Canvas → Assignment "Reading Marathon Week X" → dán vào hộp Comment → nhấn Submit.</div>
+    <textarea id="report-text" readonly></textarea>
+    <div class="modal-actions">
+      <button class="btn-copy" onclick="copyReport()">📋 Sao Chép</button>
+      <button class="btn-close-modal" onclick="closeReport()">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════════════
+// Version 2 — 15 NEW fun/quirky stories with inline vocab annotations
+// Body items: {t:"n"|"d", s:"...", sp?:"..."}
+// Inline vocab tokens: [[vn,en]] markers encoded as pipe-delimited within text
+// We use a special rich format for body: each word/phrase can be annotated
+// Format: text uses |word|en| markers for tooltip words, e.g. |quên|to forget|
+// The HTML renderer will parse these into <span class="vt"> tooltip elements
+
+const STORIES_V2 = [
+  // ── WEEK 1 · BÀI 8 & 9 ──────────────────────────────────────────────────
+  {
+    id:101,week:1,day:1,
+    titleVn:"Thầy Bị Mất Phấn",titleEn:"The Teacher Lost the Chalk",
+    lesson:"Bài 8 – Ở Lớp Học",
+    body:[
+      {t:"n",s:"Thầy Hùng bước vào |lớp học|classroom|. |Bảng đen|blackboard| sạch bóng. Nhưng có một vấn đề nhỏ."},
+      {t:"d",sp:"Thầy Hùng",s:"Các em ơi… thầy |mất|lost / missing| hộp |phấn|chalk| rồi."},
+      {t:"d",sp:"Minh",s:"Thưa thầy, phấn ở trên |bàn giáo viên|teacher's desk| kìa!"},
+      {t:"d",sp:"Thầy Hùng",s:"À phải! Nhưng… thầy |mất|lost| |kính|glasses| rồi. Thầy không nhìn thấy."},
+      {t:"d",sp:"Lan",s:"Thưa thầy, kính của thầy đang ở trên |đầu|head| thầy ạ!"},
+      {t:"n",s:"Cả lớp |im lặng|silent|. Thầy Hùng |sờ lên đầu|touched his head|."},
+      {t:"d",sp:"Thầy Hùng",s:"(đỏ mặt) À… đúng rồi. Vậy bây giờ |bắt đầu|let's begin| học nhé!"},
+      {t:"d",sp:"Nam",s:"(thì thầm với Hoa) Thầy mất kính mỗi |tuần|week| một lần."},
+      {t:"d",sp:"Hoa",s:"(thì thầm lại) Tuần trước thầy |mất|lost| luôn cả |sách giáo khoa|textbook|."},
+      {t:"n",s:"Thầy Hùng |viết|wrote| chữ đầu tiên lên bảng — rất to, rất |rõ ràng|clearly|. Hôm nay không có gì mất cả."}
+    ],
+    vocab:[["lớp học","classroom"],["bảng đen","blackboard"],["phấn","chalk"],["bàn giáo viên","teacher's desk"],["kính","glasses"],["mất","to lose / missing"],["im lặng","silent / quiet"],["bắt đầu","to begin / start"],["tuần","week"],["sách giáo khoa","textbook"]],
+    grammar:"Exclamatives with kìa: 'ở đó kìa!' | Location phrases: ở trên, ở dưới | 'đang + V' for ongoing actions",
+    qs:[
+      {q:"Thầy Hùng bị mất gì khi vào lớp?",
+       opts:["Mất điện thoại.","Mất hộp phấn và kính.","Mất sách giáo khoa.","Mất chìa khóa."],ans:1},
+      {q:"Kính của thầy Hùng ở đâu?",
+       opts:["Trên bàn giáo viên.","Dưới ghế.","Trên đầu thầy.","Trong túi áo."],ans:2},
+      {q:"Nam nói gì với Hoa về thầy?",
+       opts:["Thầy mất kính mỗi ngày.","Thầy mất kính mỗi tuần một lần.","Thầy không bao giờ mất đồ.","Thầy mới mua kính mới."],ans:1},
+      {q:"Tuần trước thầy Hùng mất gì?",
+       opts:["Mất phấn.","Mất kính.","Mất sách giáo khoa.","Mất điểm danh."],ans:2},
+      {q:"Cuối cùng thầy có viết lên bảng không?",
+       opts:["Không, thầy vẫn không tìm thấy phấn.","Có, thầy viết chữ rất to và rõ ràng.","Thầy nhờ học sinh viết.","Thầy dùng bút thay cho phấn."],ans:1}
+    ]
+  },
+
+  {
+    id:102,week:1,day:2,
+    titleVn:"Bài Kiểm Tra Bí Ẩn",titleEn:"The Mystery Test",
+    lesson:"Bài 8 – Ở Lớp Học",
+    body:[
+      {t:"n",s:"Hôm nay cô Linh |thông báo|announced| có |bài kiểm tra|test / quiz|. Cả lớp |hoảng loạn|panicked|."},
+      {t:"d",sp:"Cô Linh",s:"Các em chuẩn bị |giấy|paper| và |bút|pen| ra nhé."},
+      {t:"d",sp:"Hoa",s:"(thì thầm với Nam) Hôm nay có kiểm tra à? Mình không |ôn bài|reviewed / studied| gì cả!"},
+      {t:"d",sp:"Nam",s:"Mình cũng vậy. Nhưng cô chưa nói |môn gì|which subject|."},
+      {t:"d",sp:"Cô Linh",s:"Hôm nay các em kiểm tra |tiếng Việt|Vietnamese|. Đề thi rất |dễ|easy|!"},
+      {t:"d",sp:"Lan",s:"Dạ thưa cô, bài kiểm tra về |chủ đề|topic| gì ạ?"},
+      {t:"d",sp:"Cô Linh",s:"(mỉm cười) Các em |tự giới thiệu|introduce yourself| bằng tiếng Việt. Chỉ ba câu thôi."},
+      {t:"n",s:"Cả lớp |thở phào|sighed with relief|. Chỉ ba câu! Nam |bắt đầu|began| viết ngay."},
+      {t:"d",sp:"Nam",s:"'Tôi tên là Nam. Tôi học |tiếng Việt|Vietnamese|. Tôi |thích|like| học.'"},
+      {t:"d",sp:"Hoa",s:"(nhìn bài Nam) Nam ơi, cậu viết… ba câu giống hệt nhau."},
+      {t:"d",sp:"Nam",s:"(nhìn lại) À… ừ. Nhưng |ngữ pháp|grammar| đúng hết rồi!"}
+    ],
+    vocab:[["thông báo","to announce"],["bài kiểm tra","test / quiz"],["hoảng loạn","to panic"],["giấy","paper"],["ôn bài","to study / review"],["dễ","easy"],["chủ đề","topic / theme"],["tự giới thiệu","to introduce oneself"],["thở phào","to sigh with relief"],["ngữ pháp","grammar"]],
+    grammar:"Simple self-introduction: Tôi tên là… | Tôi học… | Tôi thích… | Sentence-final particles: thôi, nhé",
+    qs:[
+      {q:"Cô Linh thông báo điều gì?",
+       opts:["Hôm nay lớp đi dã ngoại.","Hôm nay có bài kiểm tra.","Hôm nay nghỉ học.","Hôm nay học bài mới."],ans:1},
+      {q:"Bài kiểm tra hôm nay về môn gì?",
+       opts:["Toán học.","Tiếng Anh.","Tiếng Việt.","Lịch sử."],ans:2},
+      {q:"Học sinh phải làm gì trong bài kiểm tra?",
+       opts:["Đọc một đoạn văn dài.","Tự giới thiệu bằng tiếng Việt (ba câu).","Dịch từ tiếng Anh sang tiếng Việt.","Viết một bài luận."],ans:1},
+      {q:"Nam viết bài kiểm tra như thế nào?",
+       opts:["Nam viết rất hay và sáng tạo.","Nam viết ba câu giống hệt nhau.","Nam không viết được gì.","Nam chép bài của Lan."],ans:1},
+      {q:"Nam nói gì để bào chữa cho bài của mình?",
+       opts:["Nam nói bài của mình rất sáng tạo.","Nam nói ngữ pháp đúng hết rồi.","Nam nói cô chưa dạy bài này.","Nam nói đề thi không rõ."],ans:1}
+    ]
+  },
+
+  {
+    id:103,week:1,day:3,
+    titleVn:"Đội Bóng Đá Của Chúng Mình",titleEn:"Our Soccer Team",
+    lesson:"Bài 9 – Cuối Tuần, Giải Trí, Thể Thao",
+    body:[
+      {t:"n",s:"Cuối tuần này, Minh và Nam |tập hợp|gathered| một đội |bóng đá|soccer| mới. Nhưng có một vấn đề."},
+      {t:"d",sp:"Minh",s:"Chúng mình cần mười một |cầu thủ|players|. Hiện tại có mấy người?"},
+      {t:"d",sp:"Nam",s:"Có ba người: tớ, cậu, và Lan."},
+      {t:"d",sp:"Minh",s:"Lan |chơi|plays| bóng đá à?"},
+      {t:"d",sp:"Lan",s:"(đứng sau Minh) Mình chơi |tốt hơn|better than| hai cậu đấy!"},
+      {t:"d",sp:"Minh",s:"À… xin lỗi! Vậy chúng mình còn thiếu mấy người?"},
+      {t:"d",sp:"Nam",s:"Còn thiếu |tám|eight| người nữa."},
+      {t:"d",sp:"Lan",s:"Không sao, |bạn bè|friends| của tớ rất nhiều. Để tớ |nhắn tin|text / message| họ."},
+      {t:"n",s:"Một giờ sau, |mười lăm|fifteen| người |xuất hiện|appeared| tại sân bóng. Và tất cả đều là |bạn|friends| của Lan."},
+      {t:"d",sp:"Minh",s:"(nhìn xung quanh) Lan ơi, đây là |đội bóng|soccer team| hay |buổi tiệc|party|?"},
+      {t:"d",sp:"Lan",s:"Cả hai! Ai đói thì mình có |bánh mì|bánh mì sandwiches| đây."}
+    ],
+    vocab:[["bóng đá","soccer"],["cầu thủ","player (sports)"],["tập hợp","to gather / assemble"],["chơi tốt hơn","to play better than"],["còn thiếu","still lacking / short of"],["nhắn tin","to text / send a message"],["xuất hiện","to appear / show up"],["đội bóng","sports team"],["buổi tiệc","a party"],["bánh mì","Vietnamese sandwich / baguette"]],
+    grammar:"Comparative: A tốt hơn B | Quantity shortfall: còn thiếu + số + noun | Conditional: để + V (let me...)",
+    qs:[
+      {q:"Minh và Nam cần bao nhiêu cầu thủ cho đội bóng?",
+       opts:["Bảy người.","Chín người.","Mười một người.","Mười lăm người."],ans:2},
+      {q:"Hiện tại đội có bao nhiêu người?",
+       opts:["Hai người.","Ba người.","Bốn người.","Năm người."],ans:1},
+      {q:"Lan nói cô ấy chơi bóng như thế nào?",
+       opts:["Lan chơi kém hơn Minh.","Lan chơi tốt hơn cả hai.","Lan không biết chơi bóng.","Lan chưa bao giờ chơi bóng."],ans:1},
+      {q:"Sau khi Lan nhắn tin, bao nhiêu người đến sân?",
+       opts:["Tám người.","Mười người.","Mười một người.","Mười lăm người."],ans:3},
+      {q:"Minh nghĩ buổi họp mặt đó giống cái gì?",
+       opts:["Một trận đấu chuyên nghiệp.","Một buổi tiệc hơn là tập bóng.","Một buổi tập luyện nghiêm túc.","Một lớp học thể dục."],ans:1}
+    ]
+  },
+
+  {
+    id:104,week:1,day:4,
+    titleVn:"Thứ Bảy Hoàn Hảo?",titleEn:"A Perfect Saturday?",
+    lesson:"Bài 9 – Cuối Tuần, Giải Trí, Thể Thao",
+    body:[
+      {t:"n",s:"Hoa có |kế hoạch|plan| hoàn hảo cho thứ Bảy: |dậy sớm|wake up early|, |tập yoga|do yoga|, ăn sáng lành mạnh, rồi đi |mua sắm|go shopping|."},
+      {t:"d",sp:"Báo thức",s:"RING RING RING — 6:00 sáng!"},
+      {t:"d",sp:"Hoa",s:"(nhấn nút |tắt|snooze / turn off|) Năm phút nữa thôi…"},
+      {t:"n",s:"Hoa |thức dậy|woke up| lúc 11 giờ trưa."},
+      {t:"d",sp:"Hoa",s:"(nhìn điện thoại) Ôi không! Tớ |ngủ quên|overslept|!"},
+      {t:"d",sp:"Lan",s:"(gọi điện) Hoa ơi! Cậu đang ở đâu? Mình |đợi|waiting| cậu để đi ăn sáng rồi!"},
+      {t:"d",sp:"Hoa",s:"(ngượng ngùng) À… mình |vừa|just now| dậy. Mình |xin lỗi|sorry|!"},
+      {t:"d",sp:"Lan",s:"Thôi được. Vậy đi ăn |trưa|lunch| nhé?"},
+      {t:"d",sp:"Hoa",s:"Ừ! Mình |mặc quần áo|get dressed| ngay bây giờ. Năm phút nữa mình đến!"},
+      {t:"n",s:"Hoa đến sau |ba mươi|thirty| phút. Lan không |bất ngờ|surprised| chút nào."}
+    ],
+    vocab:[["kế hoạch","plan"],["dậy sớm","to wake up early"],["mua sắm","to go shopping"],["tắt (báo thức)","to turn off / snooze (alarm)"],["thức dậy","to wake up"],["ngủ quên","to oversleep"],["đợi","to wait"],["vừa + V","just (did something)"],["mặc quần áo","to get dressed"],["bất ngờ","surprised"]],
+    grammar:"'Vừa + V' for immediate past: vừa dậy = just woke up | Time expressions: lúc 6 giờ, sau ba mươi phút | 'Thôi được' = alright / fine then",
+    qs:[
+      {q:"Hoa có kế hoạch gì cho sáng thứ Bảy?",
+       opts:["Ngủ đến trưa.","Dậy sớm, tập yoga, ăn sáng lành mạnh, đi mua sắm.","Đi xem phim với Lan.","Ở nhà đọc sách."],ans:1},
+      {q:"Hoa thức dậy lúc mấy giờ?",
+       opts:["6 giờ sáng.","8 giờ sáng.","11 giờ trưa.","1 giờ chiều."],ans:2},
+      {q:"Lan đang chờ Hoa để làm gì?",
+       opts:["Đi tập yoga.","Đi ăn sáng.","Đi mua sắm.","Đi xem phim."],ans:1},
+      {q:"Hoa nói sẽ đến sau bao lâu?",
+       opts:["Mười phút.","Năm phút.","Hai mươi phút.","Một tiếng."],ans:1},
+      {q:"Thực tế Hoa đến sau bao lâu?",
+       opts:["Đúng năm phút.","Mười lăm phút.","Ba mươi phút.","Một tiếng."],ans:2}
+    ]
+  },
+
+  {
+    id:105,week:1,day:5,
+    titleVn:"Robot Hay Người?",titleEn:"Robot or Human?",
+    lesson:"Bài 9 – Cuối Tuần, Giải Trí, Thể Thao",
+    body:[
+      {t:"n",s:"Minh |tải về|downloaded| một ứng dụng |học tiếng Việt|learn Vietnamese| mới. Nhưng ứng dụng này hơi |kỳ lạ|weird / strange|."},
+      {t:"d",sp:"Ứng dụng",s:"Xin chào! Tôi là AI. Cuối tuần này bạn muốn làm gì?"},
+      {t:"d",sp:"Minh",s:"Tôi |muốn|want| đi |đánh cầu lông|play badminton|."},
+      {t:"d",sp:"Ứng dụng",s:"Tuyệt vời! Đánh cầu lông rất |tốt cho sức khỏe|good for health|. Bạn có |vợt|racket| không?"},
+      {t:"d",sp:"Minh",s:"Có. Nhưng |vợt|racket| của tôi bị |gãy|broken|."},
+      {t:"d",sp:"Ứng dụng",s:"Ồ không! Bạn |cảm thấy|feel| thế nào?"},
+      {t:"d",sp:"Minh",s:"(bối rối) Tôi cảm thấy… |bình thường|normal / fine|. Cái vợt gãy, không phải tôi."},
+      {t:"d",sp:"Ứng dụng",s:"Tôi hiểu. Bạn có |cần|need| giúp đỡ không?"},
+      {t:"d",sp:"Minh",s:"Ừ, tôi cần |mua|buy| vợt mới. Cửa hàng |thể thao|sporting goods| ở đâu?"},
+      {t:"d",sp:"Ứng dụng",s:"Tôi không biết. Tôi là AI. Nhưng… tôi |chúc|wish| bạn mua được vợt đẹp!"},
+      {t:"d",sp:"Minh",s:"(thở dài) Cảm ơn. Mình sẽ hỏi |Google|Google|."}
+    ],
+    vocab:[["tải về","to download"],["kỳ lạ","weird / strange"],["đánh cầu lông","to play badminton"],["vợt","racket (badminton/tennis)"],["gãy","broken / snapped"],["cảm thấy","to feel"],["bình thường","normal / fine"],["cần","to need"],["cửa hàng thể thao","sporting goods store"],["chúc","to wish (someone something)"]],
+    grammar:"'Cảm thấy + adj': to feel... | 'Cần + V': to need to... | Clarification: 'không phải tôi' (not me) | 'Chúc + person + noun/clause'",
+    qs:[
+      {q:"Minh muốn làm gì cuối tuần?",
+       opts:["Đi xem phim.","Đánh cầu lông.","Tập yoga.","Chơi bóng đá."],ans:1},
+      {q:"Vấn đề của Minh là gì?",
+       opts:["Minh không có thời gian.","Vợt của Minh bị gãy.","Minh bị ốm.","Sân cầu lông đóng cửa."],ans:1},
+      {q:"Tại sao Minh bối rối khi ứng dụng hỏi anh cảm thấy thế nào?",
+       opts:["Vì Minh không hiểu câu hỏi.","Vì cái vợt gãy, không phải Minh bị thương.","Vì Minh cảm thấy rất buồn.","Vì Minh không muốn nói chuyện."],ans:1},
+      {q:"Ứng dụng có biết cửa hàng thể thao ở đâu không?",
+       opts:["Có, nó chỉ đường rất rõ.","Không, nó là AI và không biết.","Có, nó gửi bản đồ cho Minh.","Không, nó bảo Minh hỏi bạn bè."],ans:1},
+      {q:"Cuối cùng Minh quyết định làm gì?",
+       opts:["Tiếp tục chat với ứng dụng.","Hỏi Google.","Gọi điện cho Nam.","Không mua vợt nữa."],ans:1}
+    ]
+  },
+
+  // ── WEEK 2 · BÀI 10, 11, 12 ─────────────────────────────────────────────
+  {
+    id:106,week:2,day:1,
+    titleVn:"Hỏi Đường Kiểu Mới",titleEn:"Asking Directions, Modern Style",
+    lesson:"Bài 10 – Hỏi Đường",
+    body:[
+      {t:"n",s:"Nam |bị lạc|got lost| ở một |khu phố|neighborhood| mới. Anh thấy một người đứng gần đó."},
+      {t:"d",sp:"Nam",s:"Xin lỗi, |cho tôi hỏi|excuse me, may I ask|, |bệnh viện|hospital| ở đâu ạ?"},
+      {t:"d",sp:"Người đó",s:"Đi |thẳng|straight|, rồi |rẽ trái|turn left|, rồi |rẽ phải|turn right|, rồi lại đi thẳng, rồi rẽ trái, rồi qua một cái |cầu|bridge|..."},
+      {t:"d",sp:"Nam",s:"(ghi chép) Ừ… rẽ trái, rẽ phải, đi thẳng..."},
+      {t:"d",sp:"Người đó",s:"Rồi qua |ngã tư|intersection|, |vượt|cross over| con |đường lớn|main road|, đi |khoảng|approximately| năm trăm mét..."},
+      {t:"d",sp:"Nam",s:"Dạ... đó là |bệnh viện|hospital| hay là |nhà ga|train station|?"},
+      {t:"d",sp:"Người đó",s:"À xin lỗi, tôi nhầm. Đó là |siêu thị|supermarket|."},
+      {t:"d",sp:"Nam",s:"Vậy bệnh viện đâu ạ?"},
+      {t:"d",sp:"Người đó",s:"(nhìn điện thoại) Ồ, bệnh viện ở ngay |sau lưng|behind| anh kìa!"},
+      {t:"n",s:"Nam quay lại. Bệnh viện ở cách chỗ anh đứng khoảng... mười mét."}
+    ],
+    vocab:[["bị lạc","to be lost"],["khu phố","neighborhood / district"],["cho tôi hỏi","excuse me / may I ask"],["đi thẳng","go straight"],["rẽ trái / rẽ phải","turn left / turn right"],["cầu","bridge"],["ngã tư","intersection / crossroads"],["khoảng","approximately / about"],["sau lưng","behind (someone)"],["siêu thị","supermarket"]],
+    grammar:"Giving directions: đi thẳng, rẽ trái/phải, qua + landmark | 'khoảng + distance': approximately | 'kìa' for pointing out",
+    qs:[
+      {q:"Nam đang tìm đường đến đâu?",
+       opts:["Siêu thị.","Nhà ga.","Bệnh viện.","Trường học."],ans:2},
+      {q:"Người đó hướng dẫn Nam đi đến đâu?",
+       opts:["Đến bệnh viện đúng.","Nhầm, đến siêu thị.","Đến nhà ga.","Đến ngân hàng."],ans:1},
+      {q:"Bệnh viện thực ra ở đâu?",
+       opts:["Rất xa, đi xe mất 20 phút.","Ở ngay sau lưng Nam.","Ở phía bên trái.","Ở cuối con đường."],ans:1},
+      {q:"Bệnh viện cách chỗ Nam đứng bao xa?",
+       opts:["Năm trăm mét.","Một ki-lô-mét.","Mười mét.","Hai trăm mét."],ans:2},
+      {q:"Người đó tìm ra vị trí bệnh viện bằng cách nào?",
+       opts:["Nhớ đường quen.","Hỏi người khác.","Nhìn điện thoại.","Nhìn bảng hiệu."],ans:2}
+    ]
+  },
+
+  {
+    id:107,week:2,day:2,
+    titleVn:"Mua Áo Không Đơn Giản",titleEn:"Buying a Shirt Is Not Simple",
+    lesson:"Bài 11 – Mua Sắm",
+    body:[
+      {t:"n",s:"Hoa đến |cửa hàng quần áo|clothing store| để mua áo |tặng|as a gift for| anh trai."},
+      {t:"d",sp:"Người bán",s:"Chào chị! Chị muốn mua gì ạ?"},
+      {t:"d",sp:"Hoa",s:"Tôi muốn mua một cái áo |sơ mi|dress shirt| cho anh trai tôi."},
+      {t:"d",sp:"Người bán",s:"Anh trai chị |mặc|wears| |cỡ|size| mấy ạ?"},
+      {t:"d",sp:"Hoa",s:"Tôi không biết. Anh tôi… |cao|tall|, không |béo|fat| lắm, nhưng |vai|shoulders| rộng."},
+      {t:"d",sp:"Người bán",s:"Có thể là |cỡ L|size L| hoặc |cỡ XL|size XL|. Chị thử cái nào?"},
+      {t:"d",sp:"Hoa",s:"Tôi |thử|try on| cỡ L trước nhé."},
+      {t:"n",s:"Hoa mặc thử áo cỡ L. Áo |vừa vặn|fits perfectly| với cô ấy. Nhưng anh trai cô ấy cao hơn cô tới... ba mươi cm."},
+      {t:"d",sp:"Người bán",s:"(nhìn) Chị mặc trông |đẹp|looks nice| lắm! Nhưng đây là áo cho anh trai chị..."},
+      {t:"d",sp:"Hoa",s:"Ừ. Thôi cho tôi cỡ XL. Và... cái áo cỡ L này |bao nhiêu tiền|how much|?"}
+    ],
+    vocab:[["cửa hàng quần áo","clothing store"],["tặng","to give as a gift"],["áo sơ mi","dress shirt / button-up shirt"],["mặc","to wear"],["cỡ","size (clothing)"],["cao","tall"],["vai","shoulder(s)"],["thử","to try on"],["vừa vặn","fits perfectly"],["bao nhiêu tiền","how much (does it cost)"]],
+    grammar:"Describing someone's build: cao, béo, gầy, vai rộng | Asking price: … bao nhiêu tiền? | Trying on: thử + item | 'hoặc': or (either/or)",
+    qs:[
+      {q:"Hoa đến cửa hàng để mua gì?",
+       opts:["Quần jeans cho mình.","Áo sơ mi tặng anh trai.","Váy cho bạn gái.","Áo khoác cho mẹ."],ans:1},
+      {q:"Hoa mô tả anh trai của mình như thế nào?",
+       opts:["Thấp, gầy.","Cao, hơi béo.","Cao, vai rộng, không béo lắm.","Trung bình, vai hẹp."],ans:2},
+      {q:"Hoa thử cỡ áo nào trước?",
+       opts:["Cỡ S.","Cỡ M.","Cỡ L.","Cỡ XL."],ans:2},
+      {q:"Điều buồn cười là gì khi Hoa thử áo?",
+       opts:["Áo quá to so với Hoa.","Áo vừa vặn với Hoa nhưng không phải cho anh trai (anh cao hơn 30 cm).","Áo bị rách.","Màu áo không đẹp."],ans:1},
+      {q:"Cuối cùng Hoa quyết định mua cỡ nào?",
+       opts:["Cỡ L.","Cỡ M.","Cỡ XL.","Không mua."],ans:2}
+    ]
+  },
+
+  {
+    id:108,week:2,day:3,
+    titleVn:"Mặc Cả Ở Chợ",titleEn:"Bargaining at the Market",
+    lesson:"Bài 11 – Mua Sắm",
+    body:[
+      {t:"n",s:"Nam lần đầu tiên đi |chợ|market| ở Việt Nam. Cô hướng dẫn viên |khuyên|advised| anh: 'Phải |mặc cả|bargain|!'"},
+      {t:"d",sp:"Người bán",s:"Anh ơi! Mua |nón lá|conical hat| không? Đẹp lắm!"},
+      {t:"d",sp:"Nam",s:"Cái này |giá|price| bao nhiêu ạ?"},
+      {t:"d",sp:"Người bán",s:"Hai trăm ngàn đồng thôi anh."},
+      {t:"d",sp:"Nam",s:"(nhớ lời cô hướng dẫn) À... |đắt|expensive| quá. |Giảm|reduce| một chút được không?"},
+      {t:"d",sp:"Người bán",s:"Thôi, |một trăm tám mươi|180,000|."},
+      {t:"d",sp:"Nam",s:"(tự tin hơn) Một trăm ngàn thôi."},
+      {t:"d",sp:"Người bán",s:"(nhìn Nam) Anh là người Mỹ à? Mặc cả |giỏi|skilled| lắm!"},
+      {t:"d",sp:"Nam",s:"(cười) Dạ, nhưng tôi học |tiếng Việt|Vietnamese|."},
+      {t:"d",sp:"Người bán",s:"Được rồi, một trăm hai mươi ngàn cho anh. Vì anh nói tiếng Việt dễ thương!"},
+      {t:"n",s:"Nam mua nón lá. Và mua thêm hai cái nữa để |tặng|give as gifts|."}
+    ],
+    vocab:[["chợ","market"],["mặc cả","to bargain / haggle"],["nón lá","Vietnamese conical hat"],["giá","price"],["đắt","expensive"],["giảm (giá)","to reduce (price)"],["giỏi","skilled / good at"],["dễ thương","cute / likeable"],["tặng","to give as a gift"],["một trăm hai mươi ngàn","120,000 (VND)"]],
+    grammar:"Bargaining language: giá bao nhiêu? / đắt quá / giảm một chút / được rồi | Currency: ngàn đồng | 'vì + reason' clause",
+    qs:[
+      {q:"Cô hướng dẫn viên khuyên Nam làm gì ở chợ?",
+       opts:["Không mua gì.","Phải mặc cả.","Trả giá thật cao.","Chỉ mua đồ có nhãn giá."],ans:1},
+      {q:"Giá ban đầu của cái nón lá là bao nhiêu?",
+       opts:["Một trăm ngàn.","Một trăm hai mươi ngàn.","Một trăm tám mươi ngàn.","Hai trăm ngàn."],ans:3},
+      {q:"Nam trả giá bao nhiêu?",
+       opts:["Chín mươi ngàn.","Một trăm ngàn.","Một trăm hai mươi ngàn.","Một trăm năm mươi ngàn."],ans:1},
+      {q:"Người bán bán cho Nam với giá bao nhiêu?",
+       opts:["Đúng hai trăm ngàn.","Một trăm ngàn.","Một trăm hai mươi ngàn.","Một trăm năm mươi ngàn."],ans:2},
+      {q:"Tại sao người bán đồng ý bán giá đó?",
+       opts:["Vì Nam người Mỹ.","Vì nón lá bị lỗi.","Vì Nam nói tiếng Việt dễ thương.","Vì chợ sắp đóng cửa."],ans:2}
+    ]
+  },
+
+  {
+    id:109,week:2,day:4,
+    titleVn:"Bác Sĩ Hơi Lo Lắng",titleEn:"A Slightly Worried Doctor",
+    lesson:"Bài 12 – Sức Khỏe",
+    body:[
+      {t:"n",s:"Lan |bị đau bụng|has a stomachache| nên đi gặp |bác sĩ|doctor|. Phòng khám hôm nay |đông|crowded|."},
+      {t:"d",sp:"Bác sĩ",s:"Chào chị. Chị |bị|be afflicted with / have| vấn đề gì ạ?"},
+      {t:"d",sp:"Lan",s:"Dạ thưa bác sĩ, tôi |đau bụng|stomachache| từ sáng ạ."},
+      {t:"d",sp:"Bác sĩ",s:"Chị ăn gì sáng nay?"},
+      {t:"d",sp:"Lan",s:"Dạ, tôi ăn |bánh mì|bánh mì sandwich|, uống |cà phê|coffee|, và... ăn thêm một cái |bánh ngọt|pastry|, và |kem|ice cream|."},
+      {t:"d",sp:"Bác sĩ",s:"(ghi chép) Và chị ăn cái đó lúc mấy giờ?"},
+      {t:"d",sp:"Lan",s:"Dạ, 7 giờ sáng ạ."},
+      {t:"d",sp:"Bác sĩ",s:"Rồi. Và chị ăn gì trước đó?"},
+      {t:"d",sp:"Lan",s:"Dạ, tối qua tôi ăn |phở|phở noodle soup|, |chả giò|spring rolls|, |xoài|mango|..."},
+      {t:"d",sp:"Bác sĩ",s:"(nhìn lên) Chị ăn nhiều như vậy mỗi ngày không?"},
+      {t:"d",sp:"Lan",s:"(ngẫm nghĩ) Dạ… hôm nay ít hơn bình thường ạ."},
+      {t:"d",sp:"Bác sĩ",s:"(thở dài nhẹ) Tôi hiểu rồi. Tôi kê |thuốc|medicine| cho chị nhé."}
+    ],
+    vocab:[["bị đau bụng","to have a stomachache"],["bác sĩ","doctor"],["đông","crowded"],["bị + illness","to have / be afflicted with"],["đau bụng","stomachache"],["bánh ngọt","pastry / sweet bread"],["kem","ice cream"],["phở","phở noodle soup"],["kê thuốc","to prescribe medicine"],["hôm nay ít hơn","less than usual today"]],
+    grammar:"Describing illness: bị + noun/adj | Listing foods: A, B, và... | 'từ + time': since (time) | 'trước đó': before that",
+    qs:[
+      {q:"Tại sao Lan đến gặp bác sĩ?",
+       opts:["Bị sốt cao.","Bị đau bụng từ sáng.","Bị gãy tay.","Bị đau đầu."],ans:1},
+      {q:"Lan ăn gì vào sáng hôm đó?",
+       opts:["Chỉ ăn bánh mì.","Bánh mì, cà phê, bánh ngọt và kem.","Phở và chả giò.","Không ăn gì."],ans:1},
+      {q:"Bác sĩ hỏi Lan về bữa ăn trước đó để làm gì?",
+       opts:["Để nấu ăn theo.","Để hiểu nguyên nhân đau bụng.","Để giới thiệu nhà hàng.","Bác sĩ đang đói."],ans:1},
+      {q:"Lan nói gì về lượng thức ăn của mình hôm nay?",
+       opts:["Ăn nhiều hơn bình thường.","Ăn ít hơn bình thường.","Ăn đúng như bình thường.","Không ăn gì từ sáng."],ans:1},
+      {q:"Cuối cùng bác sĩ làm gì?",
+       opts:["Từ chối khám.","Kê thuốc cho Lan.","Đề nghị Lan nhập viện.","Gọi điện cho gia đình Lan."],ans:1}
+    ]
+  },
+
+  {
+    id:110,week:2,day:5,
+    titleVn:"Thuốc Hay Kẹo?",titleEn:"Medicine or Candy?",
+    lesson:"Bài 12 – Sức Khỏe",
+    body:[
+      {t:"n",s:"Minh bị |cảm|cold (illness)| nên phải ở nhà. Nam đến |thăm|visit (someone ill)|."},
+      {t:"d",sp:"Nam",s:"Cậu ổn không? Nhìn |mệt|tired / ill| lắm!"},
+      {t:"d",sp:"Minh",s:"(giọng khàn) Tớ bị |sổ mũi|runny nose|, |đau họng|sore throat|, và |nhức đầu|headache|. Nhưng không |sốt|fever|."},
+      {t:"d",sp:"Nam",s:"Cậu uống |thuốc|medicine| chưa?"},
+      {t:"d",sp:"Minh",s:"Rồi. Nhưng |thuốc|medicine| này |đắng|bitter| kinh khủng. Tớ phải ăn kẹo sau khi uống."},
+      {t:"d",sp:"Nam",s:"Cậu ăn bao nhiêu kẹo?"},
+      {t:"d",sp:"Minh",s:"(ngẫm) Khoảng… mười viên. Mỗi lần uống thuốc."},
+      {t:"d",sp:"Nam",s:"Mỗi ngày uống thuốc mấy lần?"},
+      {t:"d",sp:"Minh",s:"Ba lần. Vậy là ba mươi viên kẹo một ngày."},
+      {t:"d",sp:"Nam",s:"(nhìn Minh) Cậu ơi, thuốc |chữa bệnh|cures illness|. Kẹo thì... không giúp ích gì đâu."},
+      {t:"d",sp:"Minh",s:"Nhưng kẹo giúp tớ |vui|happy / feel good| hơn. Đó cũng là |chữa bệnh|healing|, đúng không?"}
+    ],
+    vocab:[["bị cảm","to have a cold"],["thăm","to visit (someone ill)"],["mệt","tired / feeling unwell"],["sổ mũi","runny nose"],["đau họng","sore throat"],["nhức đầu","headache"],["sốt","fever"],["thuốc","medicine"],["đắng","bitter"],["chữa bệnh","to cure / treat illness"]],
+    grammar:"Listing symptoms: bị + symptom | 'mỗi lần + V': every time | 'mỗi ngày': every day | Quantity: bao nhiêu + noun + mỗi ngày?",
+    qs:[
+      {q:"Minh bị những triệu chứng gì?",
+       opts:["Sốt cao và đau bụng.","Sổ mũi, đau họng, nhức đầu (không sốt).","Chỉ nhức đầu.","Đau chân và mệt."],ans:1},
+      {q:"Minh làm gì sau khi uống thuốc?",
+       opts:["Uống nước.","Ăn kẹo.","Ngủ ngay.","Xem phim."],ans:1},
+      {q:"Mỗi lần uống thuốc, Minh ăn bao nhiêu viên kẹo?",
+       opts:["Ba viên.","Năm viên.","Mười viên.","Hai mươi viên."],ans:2},
+      {q:"Minh uống thuốc bao nhiêu lần một ngày?",
+       opts:["Một lần.","Hai lần.","Ba lần.","Bốn lần."],ans:2},
+      {q:"Minh lý luận như thế nào về việc ăn kẹo?",
+       opts:["Kẹo giúp thuốc thấm nhanh hơn.","Kẹo làm Minh vui hơn, cũng là một cách chữa bệnh.","Bác sĩ khuyên ăn kẹo.","Kẹo có vitamin C."],ans:1}
+    ]
+  },
+
+  // ── WEEK 3 · BÀI 12–14 ──────────────────────────────────────────────────
+  {
+    id:111,week:3,day:1,
+    titleVn:"Gọi Đồ Ăn Nhầm",titleEn:"Ordering the Wrong Food",
+    lesson:"Bài 13 – Ăn Uống",
+    body:[
+      {t:"n",s:"Minh và Lan đi ăn ở một |nhà hàng|restaurant| mới. |Thực đơn|menu| dài và bằng tiếng Việt."},
+      {t:"d",sp:"Nhân viên",s:"Anh chị |gọi|order| món gì ạ?"},
+      {t:"d",sp:"Minh",s:"Tôi muốn gọi... cái số 47."},
+      {t:"d",sp:"Lan",s:"(thì thầm) Minh ơi, số 47 là |cháo lòng|organ porridge|!"},
+      {t:"d",sp:"Minh",s:"(thì thầm lại) Cháo lòng là gì?"},
+      {t:"d",sp:"Lan",s:"Là |cháo|rice porridge| nấu với |nội tạng|organs (of an animal)|..."},
+      {t:"d",sp:"Minh",s:"(đến nhân viên) Xin lỗi, tôi đổi sang số 23 được không?"},
+      {t:"d",sp:"Nhân viên",s:"Dạ được. Số 23 là |bún bò Huế|spicy beef noodle soup from Hue|. Cay không ạ?"},
+      {t:"d",sp:"Minh",s:"Dạ, tôi ăn cay được."},
+      {t:"n",s:"Bún bò Huế đến. Minh ăn một |muỗng|spoonful|. Mặt anh |đỏ|turned red|. Mắt anh |chảy nước|watered|."},
+      {t:"d",sp:"Lan",s:"(nhìn Minh) Cậu ổn không?"},
+      {t:"d",sp:"Minh",s:"(gật đầu liên tục) Ổn. Rất… |ngon|delicious|. Chỉ hơi… |cay|spicy|… một chút."}
+    ],
+    vocab:[["nhà hàng","restaurant"],["thực đơn","menu"],["gọi (món)","to order (food)"],["cháo lòng","organ porridge (Vietnamese dish)"],["cháo","rice porridge / congee"],["nội tạng","internal organs (food)"],["bún bò Huế","spicy beef noodle soup from Hué"],["muỗng","spoon / spoonful"],["đỏ mặt","face turned red"],["cay","spicy"],["ngon","delicious"]],
+    grammar:"Ordering food: tôi muốn gọi + món | Changing order: đổi sang + item | Asking about spice: cay không? | 'ăn cay được': can handle spicy food",
+    qs:[
+      {q:"Minh gọi món số 47 là món gì?",
+       opts:["Phở bò.","Bún bò Huế.","Cháo lòng.","Cơm tấm."],ans:2},
+      {q:"Tại sao Minh đổi sang món số 23?",
+       opts:["Số 47 hết rồi.","Lan nói số 47 là cháo nội tạng.","Số 23 rẻ hơn.","Minh không thích cháo."],ans:1},
+      {q:"Số 23 là món gì?",
+       opts:["Phở gà.","Bún riêu.","Bún bò Huế.","Bánh mì."],ans:2},
+      {q:"Điều gì xảy ra khi Minh ăn bún bò Huế?",
+       opts:["Minh khen ngon ngay lập tức.","Mặt Minh đỏ và mắt chảy nước.","Minh gọi thêm một tô nữa.","Minh không muốn ăn."],ans:1},
+      {q:"Minh nói gì với Lan về món ăn?",
+       opts:["Nói quá cay, không ăn được.","Nói ngon, chỉ hơi cay một chút.","Nói muốn đổi món khác.","Nói muốn về ngay."],ans:1}
+    ]
+  },
+
+  {
+    id:112,week:3,day:2,
+    titleVn:"Nấu Ăn Lần Đầu",titleEn:"Cooking for the First Time",
+    lesson:"Bài 13 – Ăn Uống",
+    body:[
+      {t:"n",s:"Hoa quyết định |nấu ăn|cook| lần đầu tiên. Cô xem video hướng dẫn nấu |phở gà|chicken pho|."},
+      {t:"d",sp:"Video",s:"Bước một: |luộc|boil| gà trong hai tiếng."},
+      {t:"d",sp:"Hoa",s:"Hai tiếng? Thôi, mình |luộc|boil| ba mươi phút thôi."},
+      {t:"d",sp:"Video",s:"Bước hai: cho |gia vị|spices| vào. |Hồi|star anise|, |quế|cinnamon|, |gừng|ginger|..."},
+      {t:"d",sp:"Hoa",s:"(nhìn vào tủ) Mình không có gia vị nào. |Thay|replace| bằng... |tương cà|ketchup| được không?"},
+      {t:"n",s:"Hoa nấu xong. Cô mời Nam ăn thử."},
+      {t:"d",sp:"Nam",s:"(nhìn tô phở) Màu này hơi... |đỏ|red|?"},
+      {t:"d",sp:"Hoa",s:"Ừ, vì mình thay hồi quế bằng tương cà."},
+      {t:"d",sp:"Nam",s:"(ăn thử) ...Hoa ơi, đây là |súp cà chua|tomato soup|, không phải phở."},
+      {t:"d",sp:"Hoa",s:"Vậy mình |đặt tên|name it| là '|phở đỏ|red pho|' vậy. |Sáng tạo|creative| hơn đấy!"}
+    ],
+    vocab:[["nấu ăn","to cook"],["phở gà","chicken pho noodle soup"],["luộc","to boil"],["gia vị","spices / seasoning"],["hồi","star anise"],["quế","cinnamon"],["gừng","ginger"],["thay (bằng)","to replace (with)"],["tương cà","ketchup"],["sáng tạo","creative"]],
+    grammar:"Cooking instructions: bước + number + V | Time duration: trong + time | 'thay bằng': to substitute with | Naming creations: đặt tên là...",
+    qs:[
+      {q:"Hoa muốn nấu món gì?",
+       opts:["Bún bò Huế.","Cháo gà.","Phở gà.","Mì Quảng."],ans:2},
+      {q:"Video nói luộc gà bao lâu?",
+       opts:["Một tiếng.","Hai tiếng.","Ba mươi phút.","Bốn mươi lăm phút."],ans:1},
+      {q:"Hoa thay gia vị bằng gì?",
+       opts:["Nước mắm.","Dầu hào.","Tương cà (ketchup).","Muối và tiêu."],ans:2},
+      {q:"Nam nói tô phở của Hoa trông như thế nào?",
+       opts:["Đẹp và thơm.","Màu đỏ, giống súp cà chua hơn là phở.","Bình thường như phở thật.","Quá loãng."],ans:1},
+      {q:"Hoa xử lý tình huống này như thế nào?",
+       opts:["Hoa xấu hổ và đổ đi.","Hoa đặt tên mới là 'phở đỏ' và cho là sáng tạo.","Hoa hứa sẽ nấu lại.","Hoa nói Nam không biết ăn."],ans:1}
+    ]
+  },
+
+  {
+    id:113,week:3,day:3,
+    titleVn:"Dự Báo Thời Tiết Sai",titleEn:"The Wrong Weather Forecast",
+    lesson:"Bài 14 – Khí Hậu và Thời Tiết",
+    body:[
+      {t:"n",s:"Sáng thứ Hai. Nam xem |dự báo thời tiết|weather forecast| trên điện thoại."},
+      {t:"d",sp:"Ứng dụng thời tiết",s:"Hôm nay |nắng|sunny|, |nhiệt độ|temperature| 28 độ, không |mưa|rain|!"},
+      {t:"d",sp:"Nam",s:"Tuyệt! Mình không cần mang |ô|umbrella|."},
+      {t:"n",s:"Nam ra ngoài. Không mang ô. Đúng 8 giờ, trời |đổ mưa|started pouring|."},
+      {t:"d",sp:"Nam",s:"(ướt sũng) Sao lại mưa?! Dự báo nói không mưa mà!"},
+      {t:"d",sp:"Người đi đường",s:"Dự báo thời tiết hôm nay |sai|wrong| hết rồi anh ơi!"},
+      {t:"d",sp:"Nam",s:"Sao lại sai được? Nó dùng |công nghệ|technology| hiện đại mà!"},
+      {t:"d",sp:"Người đó",s:"(cười) Công nghệ nào cũng |không đoán được|can't predict| thời tiết Việt Nam đâu anh."},
+      {t:"n",s:"Nam |chạy|ran| vào một |cửa hàng|shop| gần đó. Cửa hàng |bán ô|sold umbrellas|. Ô có giá... 150.000 đồng."},
+      {t:"d",sp:"Nam",s:"(nhìn vào ví) Tôi có 140.000 thôi. |Mặc cả|bargain| được không?"}
+    ],
+    vocab:[["dự báo thời tiết","weather forecast"],["nắng","sunny"],["nhiệt độ","temperature"],["mưa","rain / to rain"],["ô","umbrella"],["đổ mưa","to pour / start raining heavily"],["ướt sũng","soaking wet"],["sai","wrong / incorrect"],["công nghệ","technology"],["không đoán được","can't predict / forecast"]],
+    grammar:"Weather expressions: trời nắng/mưa/lạnh/nóng | 'đổ + weather': sudden weather change | 'sao lại + V?' = why did X happen? | 'cũng không' = not even",
+    qs:[
+      {q:"Dự báo thời tiết nói hôm nay như thế nào?",
+       opts:["Mưa to và lạnh.","Nắng, 28 độ, không mưa.","Có mây, có thể có mưa.","Bão nhỏ."],ans:1},
+      {q:"Nam quyết định không mang gì vì tin dự báo?",
+       opts:["Không mang áo khoác.","Không mang ô.","Không mang giày cao su.","Không mặc áo dài tay."],ans:1},
+      {q:"Điều gì xảy ra lúc 8 giờ sáng?",
+       opts:["Trời nắng như dự báo.","Trời đổ mưa to.","Trời lạnh đột ngột.","Có gió mạnh."],ans:1},
+      {q:"Người đi đường nói gì về dự báo thời tiết ở Việt Nam?",
+       opts:["Dự báo thời tiết luôn chính xác.","Công nghệ nào cũng không đoán được thời tiết Việt Nam.","Chỉ cần dùng ứng dụng tốt hơn.","Nên xem dự báo buổi tối."],ans:1},
+      {q:"Vấn đề của Nam khi muốn mua ô là gì?",
+       opts:["Cửa hàng đóng cửa.","Nam chỉ có 140.000 nhưng ô giá 150.000.","Nam không biết cửa hàng nào bán ô.","Ô hết hàng rồi."],ans:1}
+    ]
+  },
+
+  {
+    id:114,week:3,day:4,
+    titleVn:"Mùa Đông Ở Chapel Hill",titleEn:"Winter in Chapel Hill",
+    lesson:"Bài 14 – Khí Hậu và Thời Tiết",
+    body:[
+      {t:"n",s:"Minh (người Việt Nam) gặp Lan (người Mỹ gốc Việt) ở |trường đại học|university|. Ngoài trời |lạnh|cold|."},
+      {t:"d",sp:"Lan",s:"Minh ơi, cậu mặc áo mỏng vậy à? Hôm nay |lạnh|cold| lắm!"},
+      {t:"d",sp:"Minh",s:"Hôm nay mấy độ vậy?"},
+      {t:"d",sp:"Lan",s:"Khoảng |mười lăm|15| độ C."},
+      {t:"d",sp:"Minh",s:"Ồ! Ở Việt Nam mười lăm độ là |lạnh cắt da|bitterly cold|. Nhưng đây tớ thấy |ổn|okay / fine| à."},
+      {t:"d",sp:"Lan",s:"Chắc cậu quen với |khí hậu|climate| Chapel Hill rồi."},
+      {t:"d",sp:"Minh",s:"Hoặc là tớ mặc |bốn lớp áo|four layers|. (Cởi áo khoác — bên dưới là ba cái áo nữa)"},
+      {t:"d",sp:"Lan",s:"(ngạc nhiên) Ba cái áo à?!"},
+      {t:"d",sp:"Minh",s:"Ừ, áo phông, áo dài tay, |áo len|sweater|, và áo khoác. Mình không |chịu lạnh|tolerate cold| được."},
+      {t:"d",sp:"Lan",s:"(cười) Vậy mà lúc nãy cậu nói thấy ổn!"},
+      {t:"d",sp:"Minh",s:"Thấy |ổn bên ngoài|outwardly fine|. Bên trong thì... |đang chết cóng|dying of cold|!"}
+    ],
+    vocab:[["trường đại học","university"],["lạnh","cold"],["lạnh cắt da","bitterly cold (lit. cold that cuts skin)"],["khí hậu","climate"],["bốn lớp áo","four layers of clothing"],["áo len","sweater"],["chịu lạnh","to tolerate cold"],["đang chết cóng","dying of cold (informal)"],["mỏng","thin (of clothing)"],["quen với","accustomed to"]],
+    grammar:"Temperature expressions: mấy độ? / khoảng X độ C | 'quen với + noun': accustomed to | Contrast: bên ngoài… bên trong… | Layering: lớp + item",
+    qs:[
+      {q:"Hôm đó thời tiết ở Chapel Hill như thế nào?",
+       opts:["Nắng ấm, khoảng 28 độ.","Lạnh, khoảng 15 độ C.","Mưa và lạnh dưới 0 độ.","Có tuyết."],ans:1},
+      {q:"Minh mặc áo như thế nào bên ngoài?",
+       opts:["Mặc áo khoác dày.","Mặc áo mỏng.","Mặc áo len.","Mặc áo dài."],ans:1},
+      {q:"Thực ra bên dưới áo khoác Minh mặc bao nhiêu lớp?",
+       opts:["Một lớp.","Hai lớp.","Ba lớp (áo phông + áo dài tay + áo len).","Bốn lớp."],ans:2},
+      {q:"Minh nói anh ấy thấy thế nào ban đầu?",
+       opts:["Rất lạnh.","Ổn.","Quá nóng vì mặc nhiều áo.","Buồn ngủ."],ans:1},
+      {q:"Sự thật là Minh cảm thấy thế nào bên trong?",
+       opts:["Ấm và thoải mái.","Đang chết cóng.","Hơi lạnh nhưng chịu được.","Không cảm giác gì."],ans:1}
+    ]
+  },
+
+  {
+    id:115,week:3,day:5,
+    titleVn:"Buổi Tiệc Cuối Marathon",titleEn:"The End-of-Marathon Party",
+    lesson:"Bài 8–14 – Tổng Hợp",
+    body:[
+      {t:"n",s:"Hôm nay là ngày cuối cùng của |Marathon Đọc|Reading Marathon|. Minh, Lan, Hoa, và Nam |tụ tập|gathered| ở nhà Lan để |ăn mừng|celebrate|."},
+      {t:"d",sp:"Lan",s:"Chúng mình hoàn thành |Marathon Đọc|Reading Marathon| rồi! 🎉"},
+      {t:"d",sp:"Nam",s:"(hào hứng) Và tớ trả lời đúng hết tất cả các câu hỏi!"},
+      {t:"d",sp:"Hoa",s:"(nhìn Nam) Thật không? Câu chuyện về nấu phở cậu viết bình luận gì?"},
+      {t:"d",sp:"Nam",s:"(im lặng một chút) Tớ... không đọc câu chuyện đó."},
+      {t:"d",sp:"Minh",s:"Nam ơi, đó là câu chuyện số |mười hai|twelve|. Cậu đọc chưa?"},
+      {t:"d",sp:"Nam",s:"Tớ... bỏ qua các câu chuyện về nấu ăn. Nấu ăn không |liên quan|relevant| đến cuộc sống của tớ."},
+      {t:"d",sp:"Lan",s:"(cười) Cậu sống bằng gì vậy?"},
+      {t:"d",sp:"Nam",s:"Bánh mì và... mì gói. Và thỉnh thoảng Hoa nấu cho."},
+      {t:"d",sp:"Hoa",s:"Lần sau tớ không nấu cho cậu nữa nếu cậu không đọc câu chuyện của tớ."},
+      {t:"d",sp:"Nam",s:"(vội vàng mở điện thoại) Ồ, truyện này hay quá! Tớ đọc ngay bây giờ!"},
+      {t:"n",s:"Cả bốn người cùng cười. |Phần thưởng|prize| sẽ được công bố vào tuần tới. Nhưng hôm nay, họ đã |chiến thắng|won| điều quan trọng nhất: |tình bạn|friendship| và tiếng Việt."}
+    ],
+    vocab:[["Marathon Đọc","Reading Marathon"],["tụ tập","to gather / get together"],["ăn mừng","to celebrate"],["bình luận","comment / commentary"],["bỏ qua","to skip / pass over"],["liên quan","relevant / related to"],["mì gói","instant noodles"],["vội vàng","hurriedly / in a rush"],["phần thưởng","prize / reward"],["tình bạn","friendship"]],
+    grammar:"'Hoàn thành + task': to complete | 'Lần sau + negation': next time I won't... | Conditional threat/promise: nếu…thì… | 'đã + V': completed action",
+    qs:[
+      {q:"Minh, Lan, Hoa, Nam tụ tập để làm gì?",
+       opts:["Ôn thi cuối kỳ.","Ăn mừng hoàn thành Marathon Đọc.","Xem phim cùng nhau.","Lên kế hoạch đi du lịch."],ans:1},
+      {q:"Nam nói anh trả lời đúng tất cả câu hỏi, nhưng vấn đề là gì?",
+       opts:["Nam đoán mò hết.","Nam không đọc câu chuyện về nấu ăn.","Nam chép bài của Hoa.","Nam đọc nhầm câu chuyện."],ans:1},
+      {q:"Nam thường ăn gì?",
+       opts:["Tự nấu cơm mỗi ngày.","Bánh mì, mì gói, và thỉnh thoảng Hoa nấu.","Ăn ở nhà hàng mỗi ngày.","Nhờ Minh nấu cho."],ans:1},
+      {q:"Hoa đe dọa Nam điều gì?",
+       opts:["Không cho Nam tham gia marathon nữa.","Sẽ không nấu cho Nam nếu anh không đọc câu chuyện của Hoa.","Sẽ mách thầy giáo.","Sẽ không nói chuyện với Nam nữa."],ans:1},
+      {q:"Theo câu chuyện, điều quan trọng nhất các bạn giành được từ Marathon là gì?",
+       opts:["Voucher ăn tại Bánh Mì Paris.","Điểm cao trong lớp.","Tình bạn và tiếng Việt.","Phần thưởng bí ẩn."],ans:2}
+    ]
+  }
+];
+
+
+const STORIES = STORIES_V2;
+
+// ══════════════════════════════════════════════════════
+//  STATE (localStorage)
+// ══════════════════════════════════════════════════════
+const STORE_KEY = 'viet102_marathon_v3';
+let state = loadState();
+
+function loadState(){
+  try{ const s=localStorage.getItem(STORE_KEY); if(s) return JSON.parse(s); }catch(e){}
+  return {results:{}, streak:0, lastDay:null};
+}
+function saveState(){ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+function getResult(id){ return state.results[id]||null; }
+function setResult(id,score,answers){
+  const prev=getResult(id);
+  if(!prev||score>prev.score) state.results[id]={score,answers,ts:Date.now()};
+  const today=new Date().toDateString();
+  if(state.lastDay!==today){ state.streak=(state.streak||0)+1; state.lastDay=today; }
+  saveState();
+}
+
+// ══════════════════════════════════════════════════════
+//  COMPUTED
+// ══════════════════════════════════════════════════════
+function totalDone(){ return Object.keys(state.results).length; }
+function totalScore(){ return Object.values(state.results).reduce((s,r)=>s+(r.score||0),0); }
+function accuracy(){ const d=totalDone(); if(!d) return 0; return Math.round(totalScore()/(d*10)*100); }
+function weekDone(w){ return STORIES.filter(s=>s.week===w&&getResult(s.id)).length; }
+function weekScore(w){ return STORIES.filter(s=>s.week===w).reduce((a,s)=>{const r=getResult(s.id);return a+(r?r.score:0)},0); }
+
+// ══════════════════════════════════════════════════════
+//  WEEK COLORS
+// ══════════════════════════════════════════════════════
+const WC={
+  1:{color:'var(--w1)',bg:'var(--w1-bg)',mid:'var(--w1-mid)',emoji:'📚'},
+  2:{color:'var(--w2)',bg:'var(--w2-bg)',mid:'var(--w2-mid)',emoji:'🗺️'},
+  3:{color:'var(--w3)',bg:'var(--w3-bg)',mid:'var(--w3-mid)',emoji:'🍜'},
+};
+const WEEK_SUBTITLES={1:'Bài 8 & 9 — Lớp học · Cuối tuần · Thể thao',2:'Bài 10–12 — Hỏi đường · Mua sắm · Sức khỏe',3:'Bài 12–14 — Sức khỏe · Ăn uống · Thời tiết'};
+
+// ══════════════════════════════════════════════════════
+//  NAV SIDEBAR
+// ══════════════════════════════════════════════════════
+function buildSidebar(){
+  const nav=document.getElementById('sidebar-nav'); nav.innerHTML='';
+  [1,2,3].forEach(w=>{
+    const wg=document.createElement('div'); wg.className='week-group';
+    wg.innerHTML=`<div class="week-label" style="color:${WC[w].mid}">Tuần ${w}</div>`;
+    STORIES.filter(s=>s.week===w).forEach(s=>{
+      const r=getResult(s.id); const done=!!r;
+      const item=document.createElement('div');
+      item.className='nav-item'+(done?' done':'');
+      item.id=`nav-${s.id}`;
+      item.innerHTML=`
+        <span class="ni-icon">${done?'✅':'📖'}</span>
+        <span class="ni-title"><div style="font-weight:700;font-size:12px">${s.titleVn}</div><div class="ni-day">Ngày ${s.day}</div></span>
+        ${r?`<span class="ni-score" style="color:${r.score>=8?'#2ECC71':r.score>=5?'var(--gold)':'#E74C3C'}">${r.score}/10</span>`:''}
+      `;
+      item.onclick=()=>openStory(s.id);
+      wg.appendChild(item);
+    });
+    nav.appendChild(wg);
+  });
+  const pct=Math.round(totalDone()/15*100);
+  document.getElementById('sb-fill').style.width=pct+'%';
+  document.getElementById('sb-text').textContent=`${totalDone()} / 15 câu chuyện hoàn thành`;
+}
+
+function updateTopbar(){
+  const sc=totalScore(), done=totalDone();
+  document.getElementById('tb-points').textContent=sc+' điểm';
+  document.getElementById('tb-stars').textContent=done>=15?'🏆':done>=10?'🌟':done>=5?'⭐':'📖';
+}
+
+// ══════════════════════════════════════════════════════
+//  DASHBOARD
+// ══════════════════════════════════════════════════════
+function buildDashboard(){
+  document.getElementById('stat-done').textContent=totalDone()+'/15';
+  document.getElementById('stat-score').textContent=totalScore();
+  document.getElementById('stat-pct').textContent=accuracy()+'%';
+  document.getElementById('stat-streak').textContent='🔥'+(state.streak||0);
+  const wc=document.getElementById('dash-weeks'); wc.innerHTML='';
+  [1,2,3].forEach(w=>{
+    const wStories=STORIES.filter(s=>s.week===w);
+    const wd=weekDone(w), ws=weekScore(w);
+    const div=document.createElement('div');
+    div.className='week-card';
+    div.style.cssText=`--wc:${WC[w].color};--wc-bg:${WC[w].bg};border-top-color:${WC[w].color}`;
+    div.innerHTML=`
+      <div class="wc-header">
+        <div class="wc-title">${WC[w].emoji} Tuần ${w}</div>
+        <div class="wc-badge" style="background:${WC[w].bg};color:${WC[w].color}">${wd}/5</div>
+      </div>
+      <div class="wc-lessons" style="margin-bottom:8px">${WEEK_SUBTITLES[w]}</div>
+      <div class="wc-lessons">${wd===5?'✅ Hoàn thành · '+ws+'/50 điểm':'Điểm tuần: '+ws+'/50'}</div>
+      <div style="height:1px;background:#f0ece8;margin:10px 0"></div>
+      ${wStories.map(s=>{const r=getResult(s.id);return`<div class="story-mini" onclick="openStory(${s.id})">
+        <span class="sm-icon">${r?'✅':'📖'}</span>
+        <span class="sm-title">Ngày ${s.day}: ${s.titleVn}</span>
+        ${r?`<span class="sm-score">${r.score}/10</span>`:''}
+      </div>`}).join('')}
+    `;
+    wc.appendChild(div);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+//  TOOLTIP PARSER
+//  Parses |phrase|translation| tokens in a string
+//  into <span class="vt"> elements
+// ══════════════════════════════════════════════════════
+function parseTooltips(text, weekClass){
+  // Match |phrase|translation| patterns
+  return esc(text).replace(/\|([^|]+)\|([^|]+)\|/g, (_, vn, en)=>{
+    return `<span class="vt ${weekClass}" tabindex="0">${vn}<span class="vt-tip">🇻🇳 ${vn}<br>🇺🇸 ${en}</span></span>`;
+  });
+}
+
+// ══════════════════════════════════════════════════════
+//  TTS ENGINE
+// ══════════════════════════════════════════════════════
+let ttsUtterance = null;
+let ttsPlaying = false;
+let ttsVoice = null;
+
+function getTTSVoices(){
+  return speechSynthesis.getVoices().filter(v=>v.lang.startsWith('vi'));
+}
+
+function stripAnnotations(text){
+  // Remove |word|trans| markup, keep just the word
+  return text.replace(/\|([^|]+)\|[^|]+\|/g,'$1');
+}
+
+function buildTTSScript(story){
+  // Build plain text script for TTS: narration + dialogue
+  return story.body.map(item=>{
+    const clean = stripAnnotations(item.s);
+    if(item.t==='n') return clean;
+    return `${item.sp}: ${clean}`;
+  }).join('\n');
+}
+
+function startTTS(story, rate){
+  stopTTS();
+  if(!window.speechSynthesis){ alert('Trình duyệt của bạn không hỗ trợ TTS.'); return; }
+  const script = buildTTSScript(story);
+  ttsUtterance = new SpeechSynthesisUtterance(script);
+  ttsUtterance.lang = 'vi-VN';
+  ttsUtterance.rate = rate||1.0;
+  ttsUtterance.pitch = 1.0;
+  // Try to use a Vietnamese voice
+  const voices = getTTSVoices();
+  if(voices.length>0) ttsUtterance.voice = voices[0];
+  ttsUtterance.onend = ()=>{ ttsPlaying=false; updateTTSBtn(false); };
+  ttsUtterance.onerror = ()=>{ ttsPlaying=false; updateTTSBtn(false); };
+  speechSynthesis.speak(ttsUtterance);
+  ttsPlaying=true;
+  updateTTSBtn(true);
+}
+
+function stopTTS(){
+  if(window.speechSynthesis) speechSynthesis.cancel();
+  ttsPlaying=false;
+  updateTTSBtn(false);
+}
+
+function toggleTTS(story){
+  if(ttsPlaying){ stopTTS(); return; }
+  const rateEl=document.getElementById('tts-rate');
+  const rate=rateEl?parseFloat(rateEl.value):1.0;
+  startTTS(story, rate);
+}
+
+function updateTTSBtn(playing){
+  const btn=document.getElementById('btn-tts');
+  if(!btn) return;
+  if(playing){
+    btn.className='btn-tts playing';
+    btn.innerHTML='⏹ Dừng lại';
+  } else {
+    btn.className='btn-tts';
+    btn.innerHTML='🔊 Nghe tiếng Việt';
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  STORY VIEW
+// ══════════════════════════════════════════════════════
+let currentStory=null;
+let quizState={answers:{}, locked:{}};
+
+function openStory(id){
+  stopTTS();
+  currentStory=STORIES.find(s=>s.id===id);
+  if(!currentStory) return;
+  quizState={answers:{}, locked:{}};
+  showView('story');
+  renderStory(currentStory);
+  document.getElementById('view-story').scrollTop=0;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const ni=document.getElementById(`nav-${id}`); if(ni) ni.classList.add('active');
+  document.getElementById('tb-title').textContent=currentStory.titleVn;
+  if(window.innerWidth<=768) closeSidebar();
+}
+
+function renderStory(s){
+  const w=s.week; const wcolor=WC[w].color; const wbg=WC[w].bg;
+  const wClass='w'+w;
+  const existing=getResult(s.id);
+
+  // Body with tooltip parsing
+  const bodyHtml=s.body.map(item=>{
+    const parsed=parseTooltips(item.s, wClass);
+    if(item.t==='n') return `<div class="narr">${parsed}</div>`;
+    return `<div class="dial"><span class="dial-sp" style="color:${wcolor}">${esc(item.sp)}: </span><span class="dial-text">${parsed}</span></div>`;
+  }).join('');
+
+  // Vocab list
+  const vocabHtml=s.vocab.map(([vn,en])=>`<div class="vocab-item"><span class="vocab-vn">${esc(vn)}</span><span class="vocab-en">${esc(en)}</span></div>`).join('');
+
+  // Quiz
+  const qHtml=s.qs.map((q,qi)=>`
+    <div class="question-block" id="qblock-${qi}">
+      <div class="q-number">Câu ${qi+1}</div>
+      <div class="q-text">${esc(q.q)}</div>
+      <div class="options">
+        ${q.opts.map((opt,oi)=>`<button class="opt-btn" id="opt-${qi}-${oi}" onclick="selectOpt(${qi},${oi})" style="--wcolor:${wcolor};--wbg:${wbg}">${String.fromCharCode(65+oi)}. ${esc(opt)}</button>`).join('')}
+      </div>
+      <div class="q-feedback" id="fb-${qi}"></div>
+    </div>
+  `).join('');
+
+  const idx=STORIES.indexOf(s);
+  const prevId=idx>0?STORIES[idx-1].id:null;
+  const nextId=idx<STORIES.length-1?STORIES[idx+1].id:null;
+
+  // Check TTS support
+  const ttsSupported=!!window.speechSynthesis;
+  const ttsBar=ttsSupported
+    ? `<div class="tts-bar">
+        <button class="btn-tts" id="btn-tts" onclick="toggleTTS(currentStory)">🔊 Nghe tiếng Việt</button>
+        <select class="tts-speed" id="tts-rate">
+          <option value="0.6">🐢 Chậm</option>
+          <option value="0.85">🚶 Vừa</option>
+          <option value="1.0" selected>🚴 Bình thường</option>
+          <option value="1.3">🏃 Nhanh</option>
+        </select>
+        <span class="tts-voice-note">💡 Hover từ gạch chân để xem nghĩa</span>
+      </div>`
+    : `<div class="tts-unsupported">⚠️ Trình duyệt không hỗ trợ TTS. Vui lòng dùng Chrome / Edge.</div>`;
+
+  document.getElementById('story-view').innerHTML=`
+    <div class="story-nav">
+      <button class="btn-back" onclick="stopTTS();showView('dashboard');document.getElementById('tb-title').textContent='Marathon Đọc v2'">← Trang chủ</button>
+      <span class="story-crumb">Tuần ${w} · Ngày ${s.day} · <strong>${s.titleVn}</strong></span>
+    </div>
+
+    <div class="story-header" style="background:${wbg};border-left-color:${wcolor}">
+      <div class="sh-meta" style="color:${wcolor}">${s.lesson}</div>
+      <div class="sh-title-vn">${esc(s.titleVn)}</div>
+      <div class="sh-title-en">${esc(s.titleEn)}</div>
+    </div>
+
+    ${ttsBar}
+
+    <div class="story-body">${bodyHtml}</div>
+
+    <details class="section-card" style="cursor:pointer">
+      <summary class="section-title" style="cursor:pointer;list-style:none">
+        <span>📖</span><span style="color:${wcolor}">Từ Vựng Quan Trọng</span>
+        <span style="margin-left:auto;font-size:11px;opacity:.5;font-weight:400">▼ mở rộng</span>
+      </summary>
+      <div class="vocab-grid" style="margin-top:12px">${vocabHtml}</div>
+      <div class="grammar-box">
+        <strong>✏️ Ngữ pháp:</strong> ${esc(s.grammar)}
+      </div>
+    </details>
+
+    <div class="quiz-section">
+      <div class="quiz-header">
+        <div class="section-title" style="margin-bottom:0"><span>❓</span><span style="color:${wcolor}">Câu Hỏi Đọc Hiểu</span></div>
+        <div class="quiz-score-display" id="qscore-display">0 / 5 đúng</div>
+      </div>
+      <div id="quiz-questions">${qHtml}</div>
+      <div class="quiz-result" id="quiz-result"></div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding:0 2px">
+      ${prevId?`<button class="btn-back" onclick="openStory(${prevId})">← Bài trước</button>`:'<span></span>'}
+      ${nextId?`<button class="btn-back" style="background:${wcolor};color:#fff;border-color:${wcolor}" onclick="openStory(${nextId})">Bài tiếp →</button>`:'<span></span>'}
+    </div>
+  `;
+
+  // Touch tooltip support
+  document.querySelectorAll('.vt').forEach(el=>{
+    el.addEventListener('click',e=>{
+      e.stopPropagation();
+      const tip=el.querySelector('.vt-tip');
+      if(!tip) return;
+      // Close all others
+      document.querySelectorAll('.vt-tip.show').forEach(t=>{if(t!==tip)t.classList.remove('show')});
+      tip.classList.toggle('show');
+    });
+  });
+  document.addEventListener('click',()=>{
+    document.querySelectorAll('.vt-tip.show').forEach(t=>t.classList.remove('show'));
+  }, {once:false, capture:true});
+
+  // Restore prior answers
+  if(existing&&existing.answers){
+    Object.entries(existing.answers).forEach(([qi,oi])=>restoreAnswer(s,parseInt(qi),parseInt(oi)));
+  }
+}
+
+function esc(str){ return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── Option selection ──
+function selectOpt(qi,oi){
+  if(quizState.locked[qi]) return;
+  quizState.locked[qi]=true; quizState.answers[qi]=oi;
+  const s=currentStory; const correct=s.qs[qi].ans; const isRight=(oi===correct);
+  s.qs[qi].opts.forEach((_,i)=>{
+    const btn=document.getElementById(`opt-${qi}-${i}`);
+    btn.disabled=true;
+    if(i===correct) btn.classList.add('reveal-correct');
+    if(i===oi&&!isRight) btn.classList.add('wrong');
+    if(i===oi&&isRight) btn.classList.add('correct');
+    btn.innerHTML+=`<span class="opt-badge">${i===correct?'✅':(i===oi?'❌':'')}</span>`;
+  });
+  const fb=document.getElementById(`fb-${qi}`);
+  fb.className='q-feedback '+(isRight?'correct':'wrong');
+  fb.textContent=isRight?'✅ Chính xác! +2 điểm':'❌ Chưa đúng. Đáp án đúng đã được đánh dấu.';
+  updateQuizScore();
+  checkQuizComplete();
+}
+
+function restoreAnswer(s,qi,oi){
+  quizState.locked[qi]=true; quizState.answers[qi]=oi;
+  const correct=s.qs[qi].ans; const isRight=(oi===correct);
+  s.qs[qi].opts.forEach((_,i)=>{
+    const btn=document.getElementById(`opt-${qi}-${i}`); if(!btn) return;
+    btn.disabled=true;
+    if(i===correct) btn.classList.add('reveal-correct');
+    if(i===oi&&!isRight) btn.classList.add('wrong');
+    if(i===oi&&isRight) btn.classList.add('correct');
+    btn.innerHTML+=`<span class="opt-badge">${i===correct?'✅':(i===oi?'❌':'')}</span>`;
+  });
+  const fb=document.getElementById(`fb-${qi}`); if(fb){
+    fb.className='q-feedback '+(isRight?'correct':'wrong');
+    fb.textContent=isRight?'✅ Chính xác! +2 điểm':'❌ Chưa đúng. Đáp án đúng đã được đánh dấu.';
+  }
+}
+
+function updateQuizScore(){
+  const s=currentStory; if(!s) return;
+  const correct=Object.entries(quizState.answers).filter(([qi,oi])=>s.qs[parseInt(qi)].ans===oi).length;
+  const answered=Object.keys(quizState.answers).length;
+  document.getElementById('qscore-display').textContent=`${correct} / ${answered} đúng`;
+}
+
+function checkQuizComplete(){
+  const s=currentStory; if(!s) return;
+  if(Object.keys(quizState.answers).length<s.qs.length) return;
+  const correct=s.qs.filter((q,i)=>quizState.answers[i]===q.ans).length;
+  const score=correct*2;
+  setResult(s.id, score, quizState.answers);
+  buildSidebar(); buildDashboard(); updateTopbar();
+  const w=s.week;
+  const msgs=['','Cố lên nhé! 💪','Khá tốt! 👍','Tốt lắm! 🌟','Xuất sắc! 🎉','Hoàn hảo! 🏆'];
+  const msg=msgs[correct]||'';
+  const res=document.getElementById('quiz-result');
+  res.style.display='block';
+  const color=score>=8?'#EAFAF1':score>=5?'#FEF9E7':'#FDEDEC';
+  const tc=score>=8?'#1E8449':score>=5?'#D4A017':'#C0392B';
+  res.innerHTML=`
+    <div class="qr-circle" style="background:${color};color:${tc}">${score}</div>
+    <div class="qr-score" style="color:${tc}">${score}/10 điểm · ${correct}/5 câu đúng</div>
+    <div class="qr-msg">${msg}</div>
+    <div style="margin-top:12px">
+      ${STORIES.indexOf(s)<STORIES.length-1?`<button class="btn-next-story" style="--wcolor:${WC[w].color}" onclick="openStory(${STORIES[STORIES.indexOf(s)+1].id})">Bài tiếp theo →</button>`:''}
+      <button class="btn-retry" onclick="retryQuiz()">↩ Làm lại</button>
+    </div>
+  `;
+  if(score>=8) launchConfetti();
+}
+
+function retryQuiz(){
+  quizState={answers:{},locked:{}};
+  const s=currentStory; if(!s) return;
+  const w=s.week; const wcolor=WC[w].color; const wbg=WC[w].bg;
+  const qHtml=s.qs.map((q,qi)=>`
+    <div class="question-block" id="qblock-${qi}">
+      <div class="q-number">Câu ${qi+1}</div>
+      <div class="q-text">${esc(q.q)}</div>
+      <div class="options">
+        ${q.opts.map((opt,oi)=>`<button class="opt-btn" id="opt-${qi}-${oi}" onclick="selectOpt(${qi},${oi})" style="--wcolor:${wcolor};--wbg:${wbg}">${String.fromCharCode(65+oi)}. ${esc(opt)}</button>`).join('')}
+      </div>
+      <div class="q-feedback" id="fb-${qi}"></div>
+    </div>
+  `).join('');
+  document.getElementById('quiz-questions').innerHTML=qHtml;
+  document.getElementById('quiz-result').style.display='none';
+  document.getElementById('qscore-display').textContent='0 / 0 đúng';
+}
+
+// ══════════════════════════════════════════════════════
+//  CONFETTI
+// ══════════════════════════════════════════════════════
+function launchConfetti(){
+  const colors=['#C0392B','#D4A017','#27AE60','#2E86C1','#7B2FBE','#E67E22'];
+  for(let i=0;i<60;i++){
+    setTimeout(()=>{
+      const el=document.createElement('div');
+      el.className='confetti-piece';
+      el.style.left=Math.random()*100+'vw';
+      el.style.background=colors[Math.floor(Math.random()*colors.length)];
+      el.style.animationDuration=(1.2+Math.random()*1.2)+'s';
+      el.style.width=el.style.height=(8+Math.random()*8)+'px';
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(),2600);
+    },i*30);
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  REPORT / CANVAS EXPORT
+// ══════════════════════════════════════════════════════
+function openReport(){
+  let lines=['VIET 102 — READING MARATHON v2 REPORT','Generated: '+new Date().toLocaleString(),'','── OVERVIEW ──',`Total Stories: ${totalDone()}/15`,`Total Score: ${totalScore()}/150`,`Accuracy: ${accuracy()}%`,''];
+  [1,2,3].forEach(w=>{
+    lines.push(`── WEEK ${w} (${weekDone(w)}/5 done, ${weekScore(w)}/50 pts) ──`);
+    STORIES.filter(s=>s.week===w).forEach(s=>{
+      const r=getResult(s.id);
+      lines.push(`  Day ${s.day}: ${s.titleVn} — ${r?r.score+'/10 pts':'Not completed'}`);
+    });
+    lines.push('');
+  });
+  document.getElementById('report-text').value=lines.join('\n');
+  document.getElementById('report-modal').classList.add('open');
+}
+function closeReport(){ document.getElementById('report-modal').classList.remove('open'); }
+function copyReport(){
+  const ta=document.getElementById('report-text'); ta.select();
+  document.execCommand('copy');
+  const btn=document.querySelector('.btn-copy');
+  btn.textContent='✅ Đã sao chép!';
+  setTimeout(()=>btn.textContent='📋 Sao Chép',2000);
+}
+
+// ══════════════════════════════════════════════════════
+//  VIEW SWITCHING
+// ══════════════════════════════════════════════════════
+function showView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const v=document.getElementById('view-'+name); if(v) v.classList.add('active');
+  if(name==='dashboard'){ buildDashboard(); updateTopbar(); buildSidebar(); }
+}
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); }
+
+// ══════════════════════════════════════════════════════
+//  TTS VOICE LOAD
+// ══════════════════════════════════════════════════════
+if(window.speechSynthesis){
+  // Voices load asynchronously
+  speechSynthesis.onvoiceschanged = ()=>{ ttsVoice = getTTSVoices()[0]||null; };
+}
+
+// ══════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════
+buildSidebar();
+buildDashboard();
+updateTopbar();
+</script>
+</body>
+</html>
